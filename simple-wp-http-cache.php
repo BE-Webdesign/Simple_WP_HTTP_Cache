@@ -11,3 +11,5 @@
  *
  * @package         Simple_WP_HTTP_Cache
  */
+
+require_once 'src/main.php';

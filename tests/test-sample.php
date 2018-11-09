@@ -5,6 +5,10 @@
  * @package Simple_Wp_Http_Cache
  */
 
+namespace EC\SWPHTTPC\Tests;
+
+use \WP_UnitTestCase;
+
 /**
  * Sample test case.
  */
