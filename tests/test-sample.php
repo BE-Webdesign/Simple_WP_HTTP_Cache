@@ -12,7 +12,7 @@ use \WP_UnitTestCase;
 /**
  * Sample test case.
  */
-class SampleTest extends WP_UnitTestCase {
+class Test_Sample extends WP_UnitTestCase {
 
 	/**
 	 * A single example test.

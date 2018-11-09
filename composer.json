@@ -18,7 +18,19 @@
   "autoload": {
     "psr-0": {
       "EC\\SWPHTTPC":        "src/",
-      "EC\\SWPHTTPC\\Tests": "tests/",
+      "EC\\SWPHTTPC\\Tests": "tests/"
     }
+  },
+  "require-dev": {
+    "10up/phpcs-composer": "dev-master",
+    "phpunit/phpunit": "^6.5.8"
+  },
+  "scripts": {
+    "lint": [
+      "phpcs ."
+    ],
+    "test": [
+      "phpunit"
+    ]
   }
 }

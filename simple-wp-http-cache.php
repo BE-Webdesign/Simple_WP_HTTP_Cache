@@ -12,4 +12,5 @@
  * @package         Simple_WP_HTTP_Cache
  */
 
+// Require main source file.
 require_once 'src/main.php';
