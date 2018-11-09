@@ -1,0 +1,18 @@
+{
+  "name": "edwincromleydev/simple-wp-http-cache",
+  "description": "Simple HTTP cache and log for WordPress",
+  "keywords": ["wordpress", "plugin"],
+  "homepage": "https://edwincromley.com",
+  "license": "GPL-3.0",
+  "authors": [
+    {
+      "name": "Edwin Cromley",
+      "homepage": "https://edwincromley.com"
+    }
+  ],
+  "type": "wordpress-plugin",
+  "require": {
+    "php": ">=7.0",
+    "composer/installers": "^1.5.0"
+  }
+}
