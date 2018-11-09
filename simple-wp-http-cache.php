@@ -13,4 +13,31 @@
  */
 
 // Require main source file.
+require_once 'src/class-logger-interface.php';
+require_once 'src/class-logger.php';
 require_once 'src/main.php';
+
+$response = wp_safe_remote_get(
+	'https://edwincromley.com/wp-json/wp/v2/posts?per_page=1&fields=post_title',
+	[
+		'simple_wp_http_cache' => [
+			'active' => true,
+			'log_request_times' => true,
+		],
+	]
+);
+
+$response = wp_safe_remote_get( 'https://edwincromley.com/wp-json/wp/v2/posts?per_page=1&fields=post_title' );
+
+$response = wp_safe_remote_get(
+	'https://edwincromley.com/wp-json/wp/v2/ega',
+	[
+		'simple_wp_http_cache' => [
+			'log_errors' => true,
+			'log_request_times' => true,
+		],
+	]
+);
+// var_dump( $response );
+// var_dump( json_decode( wp_remote_retrieve_body( $response ) )[0]->id );
+// exit;
