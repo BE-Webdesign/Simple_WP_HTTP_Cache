@@ -109,6 +109,13 @@ Alternative logging solutions can be implemented based on request, or response.
 ]
 ```
 
+Whether the response is something that should be logged as an error can be
+handled via the `simple_wp_http_cache_is_error` filter. Which expects a boolean.
+
+```php
+apply_filters( 'simple_wp_http_cache_is_error', $is_error, $response, $request, $url );
+```
+
 #### `'log_request_times'`
 
 `log_request_times` is used to log any request that reaches the network, and
