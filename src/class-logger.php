@@ -21,9 +21,9 @@ class Logger implements Logger_Interface {
 	/**
 	 * Logs with an arbitrary level.
 	 *
-	 * @param mixed  $level
-	 * @param string $message
-	 * @param array  $context
+	 * @param mixed  $level   Log level for the request.
+	 * @param string $message Message to be logged.
+	 * @param array  $context Contextual data for log.
 	 * @return void
 	 */
 	public function log( $level, $message, array $context = array() ) {

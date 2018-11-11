@@ -59,6 +59,9 @@ function simple_wp_http_cache_activate() {
 	}
 }
 
+/**
+ * Error notice for insufficient PHP Version.
+ */
 function simple_wp_http_cache_activate_php_error_notice() {
 	?>
 	<div class="error below-h2">
@@ -72,6 +75,9 @@ function simple_wp_http_cache_activate_php_error_notice() {
 	<?php
 }
 
+/**
+ * Error notice for insufficient WP Version.
+ */
 function simple_wp_http_cache_activate_wp_error_notice() {
 	global $wp_version;
 	?>
@@ -86,6 +92,9 @@ function simple_wp_http_cache_activate_wp_error_notice() {
 	<?php
 }
 
+/**
+ * Deactivates Simple WP HTTP Cache.
+ */
 function simple_wp_http_cache_deactivate() {
 	deactivate_plugins( plugin_basename( __FILE__ ) );
 }

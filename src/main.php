@@ -10,6 +10,20 @@ namespace EC\SWPHTTPC;
 use \WP_HTTP_Response;
 use \WP_Error;
 
+/**
+ * Sets the time in microseconds to the current request data.
+ *
+ * If Simple WP HTTP Cache is set to log request times, then this function
+ * stores the current time before the request in the request arguments, which
+ * are then accessed later to calculate the response times and log them.
+ *
+ * The accuracy of this is probably not the best as there is still a lot of
+ * logic in WordPress being executed between when the time diff is caculated. It
+ * will at least give a rough estimate of the actual response time.
+ *
+ * @param array $request Request data.
+ * @return array Request data.
+ */
 function track_request_times( $request ) {
 	if ( isset( $request['simple_wp_http_cache']['log_request_times'] ) && true === $request['simple_wp_http_cache']['log_request_times'] ) {
 		$request['simple_wp_http_cache']['log_request_times'] = microtime( true );
@@ -20,6 +34,16 @@ function track_request_times( $request ) {
 /** This action is documented in wp-includes/class-http.php */
 add_filter( 'http_request_args', __NAMESPACE__ . '\track_request_times', 10, 1 );
 
+/**
+ * Logs http error message if request is set to log errors.
+ *
+ * @param mixed  $response Response data, either WP_Error or array.
+ * @param string $context  Context data.
+ * @param string $class    Request object class.
+ * @param array  $request  Request data.
+ * @param string $url      URL of request.
+ * @return void
+ */
 function log_request_times( $response, $context, $class, $request, $url ) {
 	if ( isset( $request['simple_wp_http_cache']['log_request_times'] ) ) {
 		log( $response, $request, $url );
@@ -28,6 +52,14 @@ function log_request_times( $response, $context, $class, $request, $url ) {
 /** This action is documented in wp-includes/class-http.php */
 add_action( 'http_api_debug', __NAMESPACE__ . '\log_request_times', 10, 5 );
 
+/**
+ * Tries to grab a previously cached response for the outgoing request.
+ *
+ * @param array  $response Response data.
+ * @param array  $request  Request data.
+ * @param string $url      URL of request.
+ * @return array|false False to continue with request, data on success.
+ */
 function check_http_cache( $response, $request, $url ) {
 	$hash  = request_hash( $request, $url );
 	$cache = cache_get( $hash );
@@ -41,6 +73,16 @@ function check_http_cache( $response, $request, $url ) {
 /** This action is documented in wp-includes/class-http.php */
 add_filter( 'pre_http_request', __NAMESPACE__ . '\check_http_cache', 10, 3 );
 
+/**
+ * Logs http error message if request is set to log errors.
+ *
+ * @param mixed  $response Response data, either WP_Error or array.
+ * @param string $context  Context data.
+ * @param string $class    Request object class.
+ * @param array  $request  Request data.
+ * @param string $url      URL of request.
+ * @return void
+ */
 function log_http_errors( $response, $context, $class, $request, $url ) {
 	if ( isset( $request['simple_wp_http_cache']['log_errors'] ) && true === $request['simple_wp_http_cache']['log_errors'] ) {
 		log_http_error( $response, $request, $url );
@@ -49,9 +91,18 @@ function log_http_errors( $response, $context, $class, $request, $url ) {
 /** This action is documented in wp-includes/class-http.php */
 add_action( 'http_api_debug', __NAMESPACE__ . '\log_http_errors', 10, 5 );
 
+/**
+ * Sets cache of HTTP Response, if the Simple WP HTTP Cache is active.
+ *
+ * @param array  $response Response data.
+ * @param array  $request  Request data.
+ * @param string $url      URL of request.
+ * @return array Return response data.
+ */
 function set_http_cache( $response, $request, $url ) {
 	// Check if request args are set to use simple cache.
 	if ( isset( $request['simple_wp_http_cache']['active'] ) && true === $request['simple_wp_http_cache']['active'] ) {
+		// Only cache actual HTTP responses.
 		if ( isset( $response['http_response'] ) && $response['http_response'] instanceof WP_HTTP_Response ) {
 			$hash = request_hash( $request, $url );
 
@@ -66,6 +117,14 @@ function set_http_cache( $response, $request, $url ) {
 /** This action is documented in wp-includes/class-http.php */
 return add_filter( 'http_response', __NAMESPACE__ . '\set_http_cache', 10, 3 );
 
+/**
+ * Grabs a cache item based on the provided key.
+ *
+ * Uses WP Transients API as a backup to WP_CACHE.
+ *
+ * @param string $key Cache entity key to lookup.
+ * @return mixed|false Returns false on failure.
+ */
 function cache_get( $key ) {
 	$data = false;
 
@@ -83,6 +142,17 @@ function cache_get( $key ) {
 	return $data;
 }
 
+/**
+ * Creates a unique hash based on the parameters of the request.
+ *
+ * Uses WP Transients API as a backup to WP_CACHE.
+ *
+ * @param string $key    Cache entity key.
+ * @param mixed  $data   Data to be saved.
+ * @param string $group  Cache group name.
+ * @param int    $expire Expiration of cache item in seconds. 0 for indefinite.
+ * @return mixed|false Returns false on failure.
+ */
 function cache_set( $key, $data, $group, $expire ) {
 	// If object caching enabled prefer that and use transient API as backup.
 	if ( defined( 'WP_CACHE' ) && WP_CACHE ) {
@@ -94,6 +164,13 @@ function cache_set( $key, $data, $group, $expire ) {
 	return $cache;
 }
 
+/**
+ * Creates a unique hash based on the parameters of the request.
+ *
+ * @param array  $request  Request data.
+ * @param string $url      URL of request.
+ * @return string
+ */
 function request_hash( $request, $url ) {
 	// Do not hash cache params, allowing for different cache params to not affect cache key look ups.
 	unset( $request['simple_wp_http_cache'] );
@@ -101,6 +178,14 @@ function request_hash( $request, $url ) {
 	return sha1( serialize( $request ) . $url ); // @codingStandardsIgnoreLine.
 }
 
+/**
+ * Logs http error message based on response data.
+ *
+ * @param mixed  $response Response data, either WP_Error or array.
+ * @param array  $request  Request data.
+ * @param string $url      URL of request.
+ * @return void
+ */
 function log_http_error( $response, $request, $url ) {
 	$is_error = false;
 
@@ -109,12 +194,22 @@ function log_http_error( $response, $request, $url ) {
 
 		$is_error = $status >= 400;
 
+		/**
+		 * Filters whether the response is an error.
+		 *
+		 * @param boolean $is_error Whether the response is an error.
+		 * @param mixed   $response Response data, either WP_Error or array.
+		 * @param array   $request  Request data.
+		 * @param string  $url      URL of request.
+		 * @return boolean
+		 */
 		$is_error = apply_filters( 'simple_wp_http_cache_is_error', $is_error, $response, $request, $url );
 	}
 
 	if ( is_wp_error( $response ) ) {
 		$is_error = true;
 
+		/** This action is documented in simple-wp-http-cache/src/main.php */
 		$is_error = apply_filters( 'simple_wp_http_cache_is_error', $is_error, $response, $request, $url );
 	}
 
@@ -123,6 +218,14 @@ function log_http_error( $response, $request, $url ) {
 	}
 }
 
+/**
+ * Logs message based on response data.
+ *
+ * @param mixed  $response Response data, either WP_Error or array.
+ * @param array  $request  Request data.
+ * @param string $url      URL of request.
+ * @return void
+ */
 function log( $response, $request, $url ) {
 	if ( is_array( $response ) && isset( $response['http_response'] ) && $response['http_response'] instanceof WP_HTTP_Response ) {
 		$headers         = $response['http_response']->get_headers();
