@@ -25,7 +25,7 @@ add_action( 'admin_init', 'simple_wp_http_cache_activate' );
 function simple_wp_http_cache_activate() {
 	// Set minimum versions.
 	$php = '7.0.0';
-	$wp = '4.9.8';
+	$wp  = '4.9.8';
 
 	global $wp_version;
 	$flag = '';
@@ -42,19 +42,19 @@ function simple_wp_http_cache_activate() {
 
 	simple_wp_http_cache_deactivate();
 
-	if ( $flag === 'PHP' ) {
+	if ( 'PHP' === $flag ) {
 		add_action( 'admin_notices', 'simple_wp_http_cache_activate_php_error_notice' );
 
-		if ( is_admin() && isset( $_GET ) ) {
-			unset( $_GET['activate'] );
+		if ( is_admin() && isset( $_GET ) ) { // @codingStandardsIgnoreLine.
+			unset( $_GET['activate'] ); // @codingStandardsIgnoreLine.
 		}
 	}
 
-	if ( $flag === 'WordPress' ) {
+	if ( 'WordPress' === $flag ) {
 		add_action( 'admin_notices', 'simple_wp_http_cache_activate_wp_error_notice' );
 
-		if ( is_admin() && isset( $_GET ) ) {
-			unset( $_GET['activate'] );
+		if ( is_admin() && isset( $_GET ) ) { // @codingStandardsIgnoreLine.
+			unset( $_GET['activate'] ); // @codingStandardsIgnoreLine.
 		}
 	}
 }
@@ -65,7 +65,7 @@ function simple_wp_http_cache_activate_php_error_notice() {
 		<p>
 		<?php
 			/* translators: %s is the current PHP version */
-			printf( __( 'Simple WP HTTP Cache requires at least PHP 7.0.0, your server is running: %s. Contact your hosting provider to upgrade.', 'simple-wp-http-cache' ), sanitize_text_field( PHP_VERSION ) );
+			printf( esc_html__( 'Simple WP HTTP Cache requires at least PHP 7.0.0, your server is running: %s. Contact your hosting provider to upgrade.', 'simple-wp-http-cache' ), esc_html( sanitize_text_field( PHP_VERSION ) ) );
 		?>
 		</p>
 	</div>
@@ -79,7 +79,7 @@ function simple_wp_http_cache_activate_wp_error_notice() {
 		<p>
 		<?php
 			/* translators: %s is the current WordPress version */
-			printf( __( 'Simple WP HTTP Cache requires at least WordPress 4.9.8, your server is running: %s. Use the WordPress admin dashboard to upgrade, make sure to backup first!', 'simple-wp-http-cache' ), sanitize_text_field( $wp_version ) );
+			printf( esc_html__( 'Simple WP HTTP Cache requires at least WordPress 4.9.8, your server is running: %s. Use the WordPress admin dashboard to upgrade, make sure to backup first!', 'simple-wp-http-cache' ), esc_html( sanitize_text_field( $wp_version ) ) );
 		?>
 		</p>
 	</div>

@@ -16,9 +16,7 @@ class Logger implements Logger_Interface {
 	 *
 	 * @return void
 	 */
-	public function __construct() {
-		return;
-	}
+	public function __construct() {}
 
 	/**
 	 * Logs with an arbitrary level.
@@ -30,7 +28,7 @@ class Logger implements Logger_Interface {
 	 */
 	public function log( $level, $message, array $context = array() ) {
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-			error_log( $message );
+			error_log( $message ); // @codingStandardsIgnoreLine.
 		}
 	}
 }

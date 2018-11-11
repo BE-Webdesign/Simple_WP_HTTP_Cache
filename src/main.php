@@ -29,7 +29,7 @@ function log_request_times( $response, $context, $class, $request, $url ) {
 add_action( 'http_api_debug', __NAMESPACE__ . '\log_request_times', 10, 5 );
 
 function check_http_cache( $response, $request, $url ) {
-	$hash = request_hash( $request, $url );
+	$hash  = request_hash( $request, $url );
 	$cache = cache_get( $hash );
 
 	if ( false !== $cache ) {
@@ -98,7 +98,7 @@ function request_hash( $request, $url ) {
 	// Do not hash cache params, allowing for different cache params to not affect cache key look ups.
 	unset( $request['simple_wp_http_cache'] );
 
-	return sha1( serialize( $request ) . $url );
+	return sha1( serialize( $request ) . $url ); // @codingStandardsIgnoreLine.
 }
 
 function log_http_error( $response, $request, $url ) {
@@ -125,41 +125,41 @@ function log_http_error( $response, $request, $url ) {
 
 function log( $response, $request, $url ) {
 	if ( is_array( $response ) && isset( $response['http_response'] ) && $response['http_response'] instanceof WP_HTTP_Response ) {
-		$headers = $response['http_response']->get_headers();
+		$headers         = $response['http_response']->get_headers();
 		$response_object = $response['http_response']->get_response_object();
 
-		$date   = sanitize_text_field( $headers['date'] ?? date_i18n( get_option('date_format'), current_time( 'timestamp' ) ) .' @ '. date_i18n( get_option('time_format'), current_time( 'timestamp' ) ) );
-		$method = sanitize_text_field( $request['method'] ?? 'GET' );
-		$status = sanitize_text_field( $response['http_response']->get_status() ?? 'No Status' );
+		$date       = sanitize_text_field( $headers['date'] ?? date_i18n( get_option( 'date_format' ), current_time( 'timestamp' ) ) . ' @ ' . date_i18n( get_option( 'time_format' ), current_time( 'timestamp' ) ) );
+		$method     = sanitize_text_field( $request['method'] ?? 'GET' );
+		$status     = sanitize_text_field( $response['http_response']->get_status() ?? 'No Status' );
 		$user_agent = sanitize_text_field( $request['user-agent'] ?? 'No User Agent' );
-		$protocol = sanitize_text_field( 'HTTP/' . $response_object->protocol_version ?? '1.1' );
-		$message = "[$date] \"$method $url $protocol\" $status \"$user_agent\"";
+		$protocol   = sanitize_text_field( 'HTTP/' . $response_object->protocol_version ?? '1.1' );
+		$message    = "[$date] \"$method $url $protocol\" $status \"$user_agent\"";
 
 		if ( isset( $request['simple_wp_http_cache']['log_request_times'] ) ) {
 			// Get time diff in milliseconds.
-			$diff = round( ( microtime( true ) - $request['simple_wp_http_cache']['log_request_times'] ) * 1000 );
+			$diff      = round( ( microtime( true ) - $request['simple_wp_http_cache']['log_request_times'] ) * 1000 );
 			$time_diff = ' Request Latency: ' . $diff . 'ms';
 
 			$message .= $time_diff;
 		}
 
 		$log_level = apply_filters( 'simple_wp_http_cache_log_level', 'debug', $response, $request, $url );
-		$class = apply_filters( 'simple_wp_http_cache_log_class', __NAMESPACE__ . '\Logger', $response, $request, $url, $log_level );
+		$class     = apply_filters( 'simple_wp_http_cache_log_class', __NAMESPACE__ . '\Logger', $response, $request, $url, $log_level );
 
 		$logger = new $class();
 		$logger->log( $log_level, $message );
 	}
 
 	if ( is_wp_error( $response ) ) {
-		$date   = sanitize_text_field( date_i18n( get_option('date_format'), current_time( 'timestamp' ) ) .' @ '. date_i18n( get_option('time_format'), current_time( 'timestamp' ) ) );
-		$method = sanitize_text_field( $request['method'] ?? 'GET' );
-		$status = esc_html__( 'WordPress Error:', 'simple-wp-http-cache' );
+		$date     = sanitize_text_field( date_i18n( get_option( 'date_format' ), current_time( 'timestamp' ) ) . ' @ ' . date_i18n( get_option( 'time_format' ), current_time( 'timestamp' ) ) );
+		$method   = sanitize_text_field( $request['method'] ?? 'GET' );
+		$status   = esc_html__( 'WordPress Error:', 'simple-wp-http-cache' );
 		$messages = sanitize_text_field( implode( $response->get_error_messages(), ', ' ) );
 
 		$message = "[$date] \"$method $url\" $status \"$messages\"";
 
 		$log_level = apply_filters( 'simple_wp_http_cache_log_level', 'debug', $response, $request, $url );
-		$class = apply_filters( 'simple_wp_http_cache_log_class', __NAMESPACE__ . '\Logger', $response, $request, $url, $log_level );
+		$class     = apply_filters( 'simple_wp_http_cache_log_class', __NAMESPACE__ . '\Logger', $response, $request, $url, $log_level );
 
 		$logger = new $class();
 		$logger->log( $log_level, $message );
