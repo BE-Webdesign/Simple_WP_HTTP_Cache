@@ -106,6 +106,15 @@ function set_http_cache( $response, $request, $url ) {
 		if ( isset( $response['http_response'] ) && $response['http_response'] instanceof WP_HTTP_Response ) {
 			$hash = request_hash( $request, $url );
 
+			/**
+			 * Filter the cache expiration time set in seconds.
+			 *
+			 * @param array  $expiration Response data.
+			 * @param array  $response   Response data.
+			 * @param array  $request    Request data.
+			 * @param string $url        URL of request.
+			 * @return int Return expiration of the cache in seconds.
+			 */
 			$expire = apply_filters( 'simple_wp_http_cache_expiration', $request['simple_wp_http_cache']['expiration'] ?? 300, $response, $request, $url );
 
 			$cache = cache_set( $hash, wp_json_encode( $response['http_response']->to_array() ), 'simple_http_cache_group', $expire );
@@ -246,8 +255,34 @@ function log( $response, $request, $url ) {
 			$message .= $time_diff;
 		}
 
+		/**
+		 * Filters the log level for the current log request.
+		 *
+		 * @param string $log_level Log level to set for log. Default: 'debug'
+		 * @param mixed  $response  Response data, either WP_Error or array.
+		 * @param array  $request   Request data.
+		 * @param string $url       URL of request.
+		 * @return boolean
+		 */
 		$log_level = apply_filters( 'simple_wp_http_cache_log_level', 'debug', $response, $request, $url );
-		$class     = apply_filters( 'simple_wp_http_cache_log_class', __NAMESPACE__ . '\Logger', $response, $request, $url, $log_level );
+
+		/**
+		 * Filters the class name for the Logger.
+		 *
+		 * The Logger class being used should be compatible and match the
+		 * interface of `simple-wp-http-cache/src/class-logger-interface.php`.
+		 *
+		 * Make sure to use a fully declared namespace like \MyLogger, when
+		 * hooking into this filter.
+		 *
+		 * @param string $log_class Whether the response is an error.
+		 * @param mixed  $response  Response data, either WP_Error or array.
+		 * @param array  $request   Request data.
+		 * @param string $url       URL of request.
+		 * @param string $log_level The current log level for the log request.
+		 * @return boolean
+		 */
+		$class = apply_filters( 'simple_wp_http_cache_log_class', __NAMESPACE__ . '\Logger', $response, $request, $url, $log_level );
 
 		$logger = new $class();
 		$logger->log( $log_level, $message );
@@ -261,8 +296,11 @@ function log( $response, $request, $url ) {
 
 		$message = "[$date] \"$method $url\" $status \"$messages\"";
 
+		/** This action is documented in simple-wp-http-cache/src/main.php */
 		$log_level = apply_filters( 'simple_wp_http_cache_log_level', 'debug', $response, $request, $url );
-		$class     = apply_filters( 'simple_wp_http_cache_log_class', __NAMESPACE__ . '\Logger', $response, $request, $url, $log_level );
+
+		/** This action is documented in simple-wp-http-cache/src/main.php */
+		$class = apply_filters( 'simple_wp_http_cache_log_class', __NAMESPACE__ . '\Logger', $response, $request, $url, $log_level );
 
 		$logger = new $class();
 		$logger->log( $log_level, $message );
