@@ -10,6 +10,24 @@ namespace EC\SWPHTTPC;
 use \WP_HTTP_Response;
 use \WP_Error;
 
+function track_request_times( $request ) {
+	if ( isset( $request['simple_wp_http_cache']['log_request_times'] ) && true === $request['simple_wp_http_cache']['log_request_times'] ) {
+		$request['simple_wp_http_cache']['log_request_times'] = microtime( true );
+	}
+
+	return $request;
+}
+/** This action is documented in wp-includes/class-http.php */
+add_filter( 'http_request_args', __NAMESPACE__ . '\track_request_times', 10, 1 );
+
+function log_request_times( $response, $context, $class, $request, $url ) {
+	if ( isset( $request['simple_wp_http_cache']['log_request_times'] ) ) {
+		log( $response, $request, $url );
+	}
+}
+/** This action is documented in wp-includes/class-http.php */
+add_action( 'http_api_debug', __NAMESPACE__ . '\log_request_times', 10, 5 );
+
 function check_http_cache( $response, $request, $url ) {
 	$hash = request_hash( $request, $url );
 	$cache = cache_get( $hash );
@@ -48,24 +66,6 @@ function set_http_cache( $response, $request, $url ) {
 /** This action is documented in wp-includes/class-http.php */
 return add_filter( 'http_response', __NAMESPACE__ . '\set_http_cache', 10, 3 );
 
-function track_request_times( $request ) {
-	if ( isset( $request['simple_wp_http_cache']['log_request_times'] ) && true === $request['simple_wp_http_cache']['log_request_times'] ) {
-		$request['simple_wp_http_cache']['log_request_times'] = current_time( 'timestamp' );
-	}
-
-	return $request;
-}
-/** This action is documented in wp-includes/class-http.php */
-add_filter( 'http_request_args', _NAMESPACE__ . '\track_request_times', 10, 1 );
-
-function log_request_times( $response, $context, $class, $request, $url ) {
-	if ( isset( $request['simple_wp_http_cache']['log_request_times'] ) ) {
-		log( $response, $request, $url );
-	}
-}
-/** This action is documented in wp-includes/class-http.php */
-add_action( 'http_api_debug', __NAMESPACE__ . '\log_request_times', 10, 5 );
-
 function cache_get( $key ) {
 	$data = false;
 
@@ -73,21 +73,11 @@ function cache_get( $key ) {
 	if ( defined( 'WP_CACHE' ) && WP_CACHE ) {
 		$cache = wp_cache_get( $key, 'simple_http_cache_group', false, true );
 
-		$data = json_decode( $cache, true );
-
-		if ( isset( $data['body'] ) && is_string( $data['body'] ) ) {
-			$data['body'] = json_decode( $data['body'], true );
-		}
+		$data = is_string( $cache ) ? json_decode( $cache, true ) : false;
 	} else {
 		$cache = get_transient( $key );
 
-		$data = json_decode( $cache, true ) ?? false;
-
-		if ( false !== $data ) {
-			if ( isset( $data['body'] ) && is_string( $data['body'] ) ) {
-				$data['body'] = json_decode( $data['body'], true );
-			}
-		}
+		$data = is_string( $cache ) ? json_decode( $cache, true ) : false;
 	}
 
 	return $data;
@@ -146,7 +136,8 @@ function log( $error, $request, $url ) {
 		$message = "[$date] \"$method $url $protocol\" $status \"$user_agent\"";
 
 		if ( isset( $request['simple_wp_http_cache']['log_request_times'] ) ) {
-			$diff = ( current_time( 'timestamp' ) - $request['simple_wp_http_cache']['log_request_times'] );
+			// Get time diff in milliseconds.
+			$diff = round( ( microtime( true ) - $request['simple_wp_http_cache']['log_request_times'] ) * 1000 );
 			$time_diff = ' Request Latency: ' . $diff . 'ms';
 
 			$message .= $time_diff;
