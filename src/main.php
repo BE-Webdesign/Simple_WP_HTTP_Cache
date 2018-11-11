@@ -64,7 +64,7 @@ function check_http_cache( $response, $request, $url ) {
 	$hash  = request_hash( $request, $url );
 	$cache = cache_get( $hash );
 
-	if ( false !== $cache ) {
+	if ( false !== $cache && ( $request['simple_wp_http_cache']['bypass'] ?? false ) !== true ) {
 		$response = $cache;
 	}
 

@@ -76,6 +76,23 @@ Expiration can be changed from the `'simple_wp_http_cache_expiration'` filter.
 apply_filters( 'simple_wp_http_cache_expiration', $request['simple_wp_http_cache']['expiration'] ?? 300, $response, $request, $url );
 ```
 
+#### `'bypass'`
+
+By setting bypass to true you can avoid the cache hits. In the example below,
+a new cache value will be set every time. The cache lookup is bypassed, and the
+request goes through and the new response value is cached due to the active
+flag. The following is really only useful for debugging and not recommended for
+any other reason:
+
+```php
+[
+	'simple_wp_http_cache' => [
+		'active' => true,
+		'bypass' => true,
+	],
+]
+```
+
 #### `'log_errors'`
 
 `log_errors` is used to ensure that any internal WP Failures, or network request
