@@ -34,11 +34,13 @@ add_action( 'http_api_debug', __NAMESPACE__ . '\log_http_errors', 10, 5 );
 function set_http_cache( $response, $request, $url ) {
 	// Check if request args are set to use simple cache.
 	if ( isset( $request['simple_wp_http_cache']['active'] ) && true === $request['simple_wp_http_cache']['active'] ) {
-		$hash = request_hash( $request, $url );
+		if ( isset( $response['http_response'] ) && $response['http_response'] instanceof WP_HTTP_Response ) {
+			$hash = request_hash( $request, $url );
 
-		$expire = apply_filters( 'simple_wp_http_cache_expiration', $request['simple_wp_http_cache']['expiration'] ?? 300, $response, $request, $url );
+			$expire = apply_filters( 'simple_wp_http_cache_expiration', $request['simple_wp_http_cache']['expiration'] ?? 300, $response, $request, $url );
 
-		$cache = cache_set( $hash, wp_json_encode( $response ), 'simple_http_cache_group', $expire );
+			$cache = cache_set( $hash, wp_json_encode( $response['http_response']->to_array() ), 'simple_http_cache_group', $expire );
+		}
 	}
 
 	return $response;

@@ -27,7 +27,8 @@ $response = wp_safe_remote_get(
 	]
 );
 
-$response = wp_safe_remote_get( 'https://edwincromley.com/wp-json/wp/v2/posts?per_page=1&fields=post_title' );
+$response = wp_safe_remote_get( 'https://edwincromley.com/wp-json/wp/v2/posts?per_page=2&fields=post_title' );
+// echo '<pre>', var_dump( $response ), '</pre>';
 
 $response = wp_safe_remote_get(
 	'https://edwincromley.com/wp-json/wp/v2/ega',
@@ -38,6 +39,8 @@ $response = wp_safe_remote_get(
 		],
 	]
 );
-// var_dump( $response );
+echo '<pre>', var_dump( $response['http_response']->to_array() ), '</pre>';
+echo '<pre>', var_dump( array_keys( $response ) ), '</pre>';
+echo '<pre>', var_dump( $response ), '</pre>';
 // var_dump( json_decode( wp_remote_retrieve_body( $response ) )[0]->id );
-// exit;
+exit;
