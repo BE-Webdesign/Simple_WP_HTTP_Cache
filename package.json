@@ -1,4 +1,3 @@
-
 {
   "name": "simple-wp-http-cache",
   "version": "0.1.0",
@@ -6,6 +5,9 @@
   "author": "Edwin Cromley",
   "devDependencies": {
     "grunt": "~0.4.5",
-    "grunt-wp-i18n": "~0.5.0",
+    "grunt-wp-i18n": "~0.5.0"
+  },
+  "bin": {
+    "grunt": "./node_modules/.bin/grunt"
   }
 }
