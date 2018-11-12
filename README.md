@@ -19,8 +19,8 @@ Composer is a PHP dependency manager.
 
 You will need to [install composer](https://getcomposer.org/) first, before using it.
 
-You can install this plugin via Composer. To install this as a dependency run
-the following in your WordPress install root with a composer.json file present:
+To install this plugin as a dependency run the following in your WordPress
+install root folder with a composer.json file present:
 
 ```
 composer require edwincromleydev/simple-wp-http-cache:dev-master
@@ -40,6 +40,8 @@ install:
 
 This will install the plugin inside of wp-content/plugins with the matching
 plugin name.
+
+This plugin is not available on WPPackagist.
 
 ## Usage
 
