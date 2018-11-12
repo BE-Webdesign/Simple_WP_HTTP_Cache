@@ -9,7 +9,37 @@ WordPress 4.9.8+
 
 ## Installation
 
+### Basic Installation
+
 This is a WordPress plugin, and can be [installed following these instructions](https://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation_by_Uploading_a_Zip_Archive).
+
+### via Composer
+
+Composer is a PHP dependency manager.
+
+You will need to [install composer](https://getcomposer.org/) first, before using it.
+
+You can install this plugin via Composer. To install this as a dependency run
+the following in your WordPress install root with a composer.json file present:
+
+```
+composer require edwincromleydev/simple-wp-http-cache:dev-master
+```
+
+Make sure your composer.json file uses installer paths to move the dependency
+into your plugins folder. Here is a the config needed for a default WordPress
+install:
+
+```
+"extra": {
+	"installer-paths": {
+		"wp-content/plugins/{$name}": ["type:wordpress-plugin"]
+	}
+}
+```
+
+This will install the plugin inside of wp-content/plugins with the matching
+plugin name.
 
 ## Usage
 
