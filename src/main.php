@@ -281,6 +281,18 @@ function log( $response, $request, $url ) {
 		$log_level = apply_filters( 'simple_wp_http_cache_log_level', 'debug', $response, $request, $url );
 
 		/**
+		 * Filters the log level for the current log request.
+		 *
+		 * @param array  $context   Log level to set for log. Default: []
+		 * @param mixed  $response  Response data, either WP_Error or array.
+		 * @param array  $request   Request data.
+		 * @param string $url       URL of request.
+		 * @param string $log_level Log level of log request.
+		 * @return array
+		 */
+		$context = apply_filters( 'simple_wp_http_cache_log_context', [], $response, $request, $url, $log_level );
+
+		/**
 		 * Filters the class name for the Logger.
 		 *
 		 * The Logger class being used should be compatible and match the
@@ -294,12 +306,13 @@ function log( $response, $request, $url ) {
 		 * @param array  $request   Request data.
 		 * @param string $url       URL of request.
 		 * @param string $log_level The current log level for the log request.
+		 * @param array  $context   Context data.
 		 * @return boolean
 		 */
-		$class = apply_filters( 'simple_wp_http_cache_log_class', __NAMESPACE__ . '\Logger', $response, $request, $url, $log_level );
+		$class = apply_filters( 'simple_wp_http_cache_log_class', __NAMESPACE__ . '\Logger', $response, $request, $url, $log_level, $context );
 
 		$logger = new $class();
-		$logger->log( $log_level, $message );
+		$logger->log( $log_level, $message, $context );
 	}
 
 	if ( is_wp_error( $response ) ) {
@@ -314,9 +327,12 @@ function log( $response, $request, $url ) {
 		$log_level = apply_filters( 'simple_wp_http_cache_log_level', 'debug', $response, $request, $url );
 
 		/** This action is documented in simple-wp-http-cache/src/main.php */
-		$class = apply_filters( 'simple_wp_http_cache_log_class', __NAMESPACE__ . '\Logger', $response, $request, $url, $log_level );
+		$context = apply_filters( 'simple_wp_http_cache_log_context', [], $response, $request, $url, $log_level );
+
+		/** This action is documented in simple-wp-http-cache/src/main.php */
+		$class = apply_filters( 'simple_wp_http_cache_log_class', __NAMESPACE__ . '\Logger', $response, $request, $url, $log_level, $context );
 
 		$logger = new $class();
-		$logger->log( $log_level, $message );
+		$logger->log( $log_level, $message, $context );
 	}
 }
