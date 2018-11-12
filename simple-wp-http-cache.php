@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:     Simple WP HTTP Cache
- * Plugin URI:      N/A
+ * Plugin URI:      https://github.com/BE-Webdesign/Simple_WP_HTTP_Cache
  * Description:     A simple HTTP Cache and log for WordPress.
  * Author:          Edwin Cromley
  * Author URI:      https://edwincromley.com
