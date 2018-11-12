@@ -149,7 +149,18 @@ parameters for Simple WP HTTP Cache.
 The following example will cache every request WordPress makes for 10 minutes:
 
 ```php
+add_filter( 'http_request_args', function( $request ) {
+	$request['simple_wp_http_cache'] = [
+		'active'     => true,
+		'expiration' => 600,
+	];
+
+	return $request;
+}, 1, 1 );
 ```
+
+The above is not advised, but you can get a sense for the flexibility of this
+plugin.
 
 ### Logging
 
@@ -195,7 +206,6 @@ class MyLogger {
 		// Log your message to wherever it should go.
 	}
 }
-
 ```
 
 Then you can use your custom class like so:
