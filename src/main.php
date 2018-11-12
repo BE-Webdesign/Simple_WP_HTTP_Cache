@@ -45,7 +45,7 @@ add_filter( 'http_request_args', __NAMESPACE__ . '\track_request_times', 10, 1 )
  * @return void
  */
 function log_request_times( $response, $context, $class, $request, $url ) {
-	if ( isset( $request['simple_wp_http_cache']['log_request_times'] ) ) {
+	if ( isset( $request['simple_wp_http_cache']['log_request_times'] ) && ! is_http_error( $response, $request, $url ) ) {
 		log( $response, $request, $url );
 	}
 }
@@ -196,6 +196,22 @@ function request_hash( $request, $url ) {
  * @return void
  */
 function log_http_error( $response, $request, $url ) {
+	$is_error = is_http_error( $response, $request, $url );
+
+	if ( $is_error ) {
+		log( $response, $request, $url );
+	}
+}
+
+/**
+ * Checks whether an error has occurred.
+ *
+ * @param mixed  $response Response data, either WP_Error or array.
+ * @param array  $request  Request data.
+ * @param string $url      URL of request.
+ * @return boolean
+ */
+function is_http_error( $response, $request, $url ) {
 	$is_error = false;
 
 	if ( is_array( $response ) && isset( $response['http_response'] ) && $response['http_response'] instanceof WP_HTTP_Response ) {
@@ -222,9 +238,7 @@ function log_http_error( $response, $request, $url ) {
 		$is_error = apply_filters( 'simple_wp_http_cache_is_error', $is_error, $response, $request, $url );
 	}
 
-	if ( $is_error ) {
-		log( $response, $request, $url );
-	}
+	return $is_error;
 }
 
 /**
